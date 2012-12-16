@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using Android.App;
 using Android.Content;
+using Android.Net;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -48,8 +49,13 @@ namespace TweetTest.Android.Screens
         }
         private void RefreshClick(object sender, EventArgs e)
         {
-            Toast.MakeText(this, "Refreshing", ToastLength.Short).Show();
-            ThreadPool.QueueUserWorkItem(o => RefreshAsync());
+            var connectivityManager = (ConnectivityManager)GetSystemService(ConnectivityService);
+            var activeConnection = connectivityManager.ActiveNetworkInfo;
+            if ((activeConnection != null) && activeConnection.IsConnected)
+            {
+                Toast.MakeText(this, "Refreshing", ToastLength.Short).Show();
+                ThreadPool.QueueUserWorkItem(o => RefreshAsync());
+            }
         }
         private void RefreshAsync()
         {
@@ -65,13 +71,20 @@ namespace TweetTest.Android.Screens
         protected override void OnResume()
         {
             base.OnResume();
-            tweets = TweetManager.GetTweetsFromTwitter();
 
-            // create our adapter
-            tweetList = new Adapters.TweetListAdapter(this, tweets);
+            var connectivityManager = (ConnectivityManager)GetSystemService(ConnectivityService);
+            var activeConnection = connectivityManager.ActiveNetworkInfo;
+            if ((activeConnection != null) && activeConnection.IsConnected)
+            {
+                // we are connected to a network.
+                tweets = TweetManager.GetTweetsFromTwitter();
+                // create our adapter
+                tweetList = new Adapters.TweetListAdapter(this, tweets);
 
-            //Hook up our adapter to our ListView
-            TweetsListView.Adapter = tweetList;
+                //Hook up our adapter to our ListView
+                TweetsListView.Adapter = tweetList;
+            }
+           
         }
     }
 }
