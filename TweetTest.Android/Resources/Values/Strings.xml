@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Hello">Go to favorites => </string>
+    <string name="ApplicationName">TweetTest.Android</string>
+  <string name="Something">TweetTest.Trololo</string>
+  <string name="Refresh">Refresh</string>
+</resources>
